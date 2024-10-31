@@ -14,19 +14,42 @@ import pdb
 warnings.filterwarnings('ignore')
 pd.set_option('display.max_columns', 150)
 
-path = "/Users/remi/dataAnalysis/dataAnalysis2022/preprocessing/titanic/dataset/"
+path = "/home/yamazono/DAS24/yamazono/titanic/dataset/"
 
 df = pd.read_csv(path + 'train.csv')
 df_test = pd.read_csv(path + 'test.csv')
-pdb.set_trace()
 
 
 ## -------------------------------------------------
 ## データの前処理
+# 必要なカテゴリ変数をエンコード
+df['Sex'] = df['Sex'].map({'male': 0, 'female': 1})  # 性別のエンコード
+df['Embarked'].fillna('S', inplace=True)  # 欠損値を補完
+df['Embarked'] = df['Embarked'].map({'C': 0, 'Q': 1, 'S': 2})  # 出発港のエンコード
+
+# 不要な列を削除
+df.drop(['Name', 'Ticket', 'Cabin'], axis=1, inplace=True)
+
+# 同様にテストデータも処理
+df_test['Sex'] = df_test['Sex'].map({'male': 0, 'female': 1})
+df_test['Embarked'].fillna('S', inplace=True)
+df_test['Embarked'] = df_test['Embarked'].map({'C': 0, 'Q': 1, 'S': 2})
+df_test.drop(['Name', 'Ticket', 'Cabin'], axis=1, inplace=True)
+
+# 欠損値を補完（例として年齢を中央値で補完）
+df['Age'].fillna(df['Age'].median(), inplace=True)
+df_test['Age'].fillna(df_test['Age'].median(), inplace=True)
+df['Fare'].fillna(df['Fare'].median(), inplace=True)
+df_test['Fare'].fillna(df_test['Fare'].median(), inplace=True)
+
+print(df.columns)
+
+# 特徴量とラベルを再定義
+X = df.drop('Perished', axis=1).values  # 'Survived' ではなく 'Perished' を使用
+y = df['Perished'].values
+X_test = df_test.values
 
 ## -------------------------------------------------
-
-pdb.set_trace()
 
 ## ベースラインモデルの構築
 X = df.iloc[:, 2:].values
